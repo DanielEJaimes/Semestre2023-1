@@ -1,0 +1,70 @@
+###
+POST http://localhost:2323/api/registration HTTP/1.1
+Content-Type: application/json
+
+{
+  "email": "jane.doe@example.com",
+  "name": "Jane Doe",
+  "phoneNumber": "555-555-5555",
+  "position": "Marketing Manager",
+  "photoUrl": "https://example.com/jane-doe.jpg",
+  "password": "mypassword123"
+}
+
+###
+POST http://localhost:2323/api/login HTTP/1.1
+Content-Type: application/json
+
+{
+  "email":"prueba@gmail.com",
+  "password":"123"
+}
+
+###
+GET http://localhost:2323/api/users/exclude/jane.doe@example.com HTTP/1.1
+
+###
+GET http://localhost:2323/api/users/jane.doe@example.com HTTP/1.1
+
+###
+POST http://localhost:2323/api/notification HTTP/1.1
+Content-Type: application/json
+
+{
+  "title":"Prueba",
+  "body":"Notificación de prueba",
+  "token":"dOsuZEovQ1WBsDcj__-Ytd:APA91bErkCeroMoeOW9i-0pCFPupPEL9ubGrADH0rqnK83wlVCg2hZOfF05oGd6vWsi2QqvZVFZ09j67AfUWkZh4mDFx44WlIPDGChhkUPf72fkXt7Paupm9GSN4WIU5mXajUOW2Y_0D"
+}
+
+###
+POST http://localhost:2323/api/message HTTP/1.1
+Content-Type: application/json
+
+{
+  "sender": "John",
+  "receiver": "Jane",
+  "content": "Hello, Jane! How are you?"
+}
+
+###
+POST http://localhost:2323/api/fmc HTTP/1.1
+Content-Type: application/json
+
+{
+  "emailUser": "prueba@gmail.com",
+  "fmcToken": "fzNe5zrdRJy9gHbywG-JAv:APA91bHHqaFwhhFcyPven7zP2EjXVXOAv_zQ6HTwuVk2Z991dxaRlnoefvurLmbYP4OPr5bB1M27ThjmwL9aNMrDP1oomYGLRfnaBv_SNXA6aUZv3z7HOBxp1nVPn1oDkpebNrQYgWkS"
+}
+
+###
+GET http://localhost:2323/api/fmc/prueba@gmail.com HTTP/1.1
+
+###
+PUT  http://localhost:2323/api/fmc/123Abc HTTP/1.1
+Content-Type: application/json
+
+{
+  "emailUser": "123456"
+  }
+
+
+ 
