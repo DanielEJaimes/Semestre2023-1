@@ -99,18 +99,21 @@ class _ProfileState extends State<Profile> {
                       if (responseget.statusCode == 200) {
                         final dynamic decodedBody =
                             jsonDecode(responseget.body);
-                        final token = decodedBody[0][
-                            'fmcToken']; // Suponiendo que la respuesta es una lista con un solo objeto y se accede al primer objeto para obtener el valor de 'emailUser'
+                        final List<dynamic> tokens = decodedBody
+                            .map((item) => item['fmcToken'])
+                            .toList(); // Suponiendo que la respuesta es una lista con un solo objeto y se accede al primer objeto para obtener el valor de 'emailUser'
                         final message = MessageModel(
                           sender: sender,
                           receiver: widget.user.email,
                           content: content,
                         );
-                        final firebase = FirebaseModel(
-                          title: 'Mensaje nuevo!',
-                          body: content,
-                          token: token,
-                        );
+                        final firebaseMessages = tokens
+                            .map((token) => FirebaseModel(
+                                  title: 'Mensaje nuevo!',
+                                  body: content,
+                                  token: token,
+                                ))
+                            .toList();
                         final response = await http.post(
                           Uri.parse('$api/api/message'),
                           body: jsonEncode(message),
@@ -118,13 +121,19 @@ class _ProfileState extends State<Profile> {
                         );
                         if (response.statusCode == 200) {
                           print("Mensaje Enviado");
-                          final noti = await http.post(
-                            Uri.parse('$api/api/notification'),
-                            body: jsonEncode(firebase),
-                            headers: {'Content-Type': 'application/json'},
-                          );
-                          if (noti.statusCode == 200) {
-                            print('Notificación enviada');
+
+                          for (var firebase in firebaseMessages) {
+                            final noti = await http.post(
+                              Uri.parse('$api/api/notification'),
+                              body: jsonEncode(firebase),
+                              headers: {'Content-Type': 'application/json'},
+                            );
+                            if (noti.statusCode == 200) {
+                              print('Notificación enviada a $firebase.token');
+                            } else {
+                              print(
+                                  'Error al enviar notificación a $firebase.token');
+                            }
                           }
                           // El mensaje se envió correctamente
                         } else {

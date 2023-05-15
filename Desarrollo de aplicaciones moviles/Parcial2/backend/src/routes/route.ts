@@ -5,13 +5,20 @@ import { register, login } from "../controller/UserController";
 import { registerFMC } from "../controller/FmcController";
 import { registerMessage } from "../controller/MessageController";
 import FmcModel from "../models/fmcModel";
+import MessageModel from "../models/messageModel";
 
 const router = express.Router();
 
 router.post("/registration", register);
 router.post("/login", login);
-router.post("/fmc", registerFMC);
+
 router.post("/message", registerMessage);
+router.get("/message/:receiver", (req, res) => {
+  const receiver = req.params.receiver;
+  MessageModel.find({ receiver: receiver })
+    .then((data) => res.json(data))
+    .catch((error) => res.json({ message: error }));
+});
 //Obtener usuario por email
 router.get("/users/:email", (req, res) => {
   const email = req.params.email;
@@ -29,6 +36,8 @@ router.get("/users/exclude/:email", (req, res) => {
     .then((data) => res.json(data))
     .catch((error) => res.json({ message: error }));
 });
+
+router.post("/fmc", registerFMC);
 //Obtener fmcs
 router.get("/fmc/:emailUser", (req, res) => {
   const emailUser = req.params.emailUser;
@@ -36,7 +45,6 @@ router.get("/fmc/:emailUser", (req, res) => {
     .then((data) => res.json(data))
     .catch((error) => res.json({ message: error }));
 });
-
 //Actualizar fmc
 router.put("/fmc/:fmcToken", (req, res) => {
   const fmcToken = req.params.fmcToken;

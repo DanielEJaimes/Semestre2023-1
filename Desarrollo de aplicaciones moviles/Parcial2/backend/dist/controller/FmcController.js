@@ -16,8 +16,8 @@ exports.registerFMC = void 0;
 const FmcService_1 = __importDefault(require("../services/FmcService"));
 const registerFMC = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { idUser, fmcToken } = req.body;
-        const successRes = yield FmcService_1.default.registerFMC(idUser, fmcToken);
+        const { emailUser, fmcToken } = req.body;
+        const successRes = yield FmcService_1.default.registerFMC(emailUser, fmcToken);
         res.json({ status: true, success: "FMC registrado correctamente" });
     }
     catch (error) {

@@ -33,7 +33,7 @@ class _HomeState extends State<Home> {
     super.didChangeDependencies();
     final arguments = ModalRoute.of(context)!.settings.arguments;
     if (arguments != null) {
-      Map? pushArguments = arguments as Map;
+      dynamic pushArguments = arguments;
       setState(() {
         message = pushArguments["message"];
       });
@@ -115,20 +115,58 @@ class _HomeState extends State<Home> {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
-        return Container(
-          height: 600, // Ajusta la altura según tus necesidades
-          child: ListView.builder(
-            itemCount: message
-                .length, // Reemplaza 'message' con tus mensajes recibidos
-            itemBuilder: (context, index) {
-              return ListTile(
-                title: Text(message[
-                    index]), // Reemplaza 'message[index]' con la propiedad adecuada de tu modelo de mensaje
-              );
-            },
-          ),
+        return FutureBuilder<List<String>>(
+          future: getMessages(),
+          builder:
+              (BuildContext context, AsyncSnapshot<List<String>> snapshot) {
+            if (snapshot.hasData) {
+              List<String> messages = snapshot.data!;
+              if (messages.isNotEmpty) {
+                return Container(
+                  height: 600, // Ajusta la altura según tus necesidades
+                  child: ListView.builder(
+                    itemCount: messages.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        title: Text(messages[index]),
+                      );
+                    },
+                  ),
+                );
+              } else {
+                return const Center(
+                  child: Text('No hay mensajes disponibles'),
+                );
+              }
+            } else if (snapshot.hasError) {
+              return Text('Error: ${snapshot.error}');
+            } else {
+              return const CircularProgressIndicator();
+            }
+          },
         );
       },
     );
+  }
+
+  Future<List<String>> getMessages() async {
+    final response = await http.get(Uri.parse('$api/api/message/$email'));
+
+    if (response.statusCode == 200) {
+      final jsonData = json.decode(response.body);
+      if (jsonData['messages'] is List) {
+        List<String> messages = List<String>.from(jsonData['messages']);
+        return messages;
+      } else if (jsonData['messages'] is String) {
+        String messagesString = jsonData['messages'];
+        List<String> messages = messagesString
+            .split(';'); // Cambia el delimitador ';' según tus necesidades
+        return messages;
+      } else {
+        throw Exception('El campo "messages" no es una lista válida');
+      }
+    } else {
+      throw Exception('Error en la solicitud GET');
+    }
   }
 }

@@ -32,12 +32,17 @@ admin.initializeApp({
 const sendPushNotification = (req, res) => {
     try {
         const { title, body, token } = req.body;
+        if (!title || !body || !token) {
+            return res.status(400).send({
+                message: "Title, body, and token are required fields.",
+            });
+        }
         const message = {
             notification: {
-                title: title || "Test notification",
-                body: body || "Notification message",
+                title,
+                body,
             },
-            token: token,
+            token,
         };
         admin
             .messaging()

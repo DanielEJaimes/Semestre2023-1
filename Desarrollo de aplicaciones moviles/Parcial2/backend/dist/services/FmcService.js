@@ -14,11 +14,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const fmcModel_1 = __importDefault(require("../models/fmcModel"));
 class FmcService {
-    static registerFMC(idUser, fmcToken) {
+    static registerFMC(emailUser, fmcToken) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const createFMC = new fmcModel_1.default({
-                    idUser,
+                    emailUser,
                     fmcToken,
                 });
                 return yield createFMC.save();
