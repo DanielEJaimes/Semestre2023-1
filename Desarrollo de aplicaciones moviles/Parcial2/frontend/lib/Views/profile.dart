@@ -120,8 +120,6 @@ class _ProfileState extends State<Profile> {
                           headers: {'Content-Type': 'application/json'},
                         );
                         if (response.statusCode == 200) {
-                          print("Mensaje Enviado");
-
                           for (var firebase in firebaseMessages) {
                             final noti = await http.post(
                               Uri.parse('$api/api/notification'),
@@ -129,21 +127,18 @@ class _ProfileState extends State<Profile> {
                               headers: {'Content-Type': 'application/json'},
                             );
                             if (noti.statusCode == 200) {
-                              print('Notificación enviada a $firebase.token');
+                              //
                             } else {
-                              print(
-                                  'Error al enviar notificación a $firebase.token');
+                              //
                             }
                           }
                           // El mensaje se envió correctamente
                         } else {
                           // Ocurrió un error al enviar el mensaje
-                          print(
-                              "Error al enviar el mensaje: ${response.statusCode}");
                         }
                       }
                     } catch (e) {
-                      print("Error en la solicitud HTTP: $e");
+                      //
                     } finally {
                       Get.back();
                     }

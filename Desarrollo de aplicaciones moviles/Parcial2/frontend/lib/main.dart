@@ -24,7 +24,6 @@ void main() async {
   await Firebase.initializeApp();
   String? firebaseToken = await FirebaseMessaging.instance.getToken();
   firebasetoken = firebaseToken;
-  print(firebasetoken);
 
   if (firebasetoken != null) {
     storage.write(key: 'firebasetoken', value: firebasetoken);
@@ -68,5 +67,4 @@ void main() async {
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
-  print('_firebaseMessagingBackgroundHandler: $message');
 }

@@ -1,5 +1,8 @@
+// ignore_for_file: empty_catches
+
 import 'dart:convert';
 import 'dart:io';
+import 'package:frontend/Views/home.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:frontend/Views/login.dart';
@@ -7,6 +10,8 @@ import 'package:get/get.dart';
 import 'package:cloudinary_public/cloudinary_public.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../Models/fmc.dart';
 import '../Models/user.dart';
 
 String cloudname = dotenv.get('CLOUDINARY_CLOUDNAME');
@@ -22,7 +27,6 @@ Future<String?> uploadImageToCloudinary(File imageFile) async {
 
     return response.secureUrl;
   } catch (e) {
-    print(e);
     return null;
   }
 }
@@ -39,6 +43,8 @@ class _RegisterState extends State<Register> {
   final _formKey = GlobalKey<FormState>();
   late String _email, _password, _fullName, _phoneNumber, _position, _imageUrl;
   File? _image;
+  late SharedPreferences prefs;
+  late String firebasetoken;
 
   @override
   void initState() {
@@ -48,6 +54,8 @@ class _RegisterState extends State<Register> {
 
   Future<void> loadEnv() async {
     await dotenv.load();
+    firebasetoken = (await storage.read(key: 'firebasetoken'))!;
+    prefs = await SharedPreferences.getInstance();
   }
 
   Future<void> _pickImage(ImageSource source) async {
@@ -208,16 +216,49 @@ class _RegisterState extends State<Register> {
                         if (response.statusCode == 200) {
                           // El usuario ha sido creado con éxito
                           Get.back();
-                          Get.to(() => const Login());
+
+                          final user = LoginUserModel(
+                            email: _email,
+                            password: _password,
+                          );
+                          final fmc = FmcModel(
+                            emailUser: _email,
+                            fmcToken: firebasetoken,
+                          );
+                          final response = await http.post(
+                            Uri.parse('$api/api/login'),
+                            body: jsonEncode(user),
+                            headers: {'Content-Type': 'application/json'},
+                          );
+                          if (response.statusCode == 200) {
+                            // El usuario ha iniciado sesión con éxito
+                            var myToken = jsonDecode(response.body)['token'];
+                            prefs.setString('token', myToken);
+                            final firebasetokenResponse = await http.put(
+                              Uri.parse('$api/api/fmc/${fmc.fmcToken}'),
+                              body: jsonEncode(fmc),
+                              headers: {'Content-Type': 'application/json'},
+                            );
+
+                            if (firebasetokenResponse.statusCode == 200) {
+                              // El firebasetoken se guardó correctamente en la base de datos
+                            } else {
+                              // Ocurrió un error al guardar el firebasetoken en la base de datos
+                              Get.back();
+                            }
+                            Get.back();
+                            Get.to(() => Home(
+                                  token: myToken,
+                                ));
+                          } else {
+                            Get.back();
+                            // Ocurrió un error al iniciar sesión
+                          }
                         } else {
                           // Ocurrió un error al crear el usuario
-                          final error = jsonDecode(response.body)['message'];
-                          print(error);
                         }
                       }
-                    } catch (e) {
-                      print('Error: $e');
-                    }
+                    } catch (e) {}
                   },
                 ),
                 TextButton(

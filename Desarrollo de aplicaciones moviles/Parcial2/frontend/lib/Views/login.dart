@@ -127,13 +127,9 @@ class _LoginState extends State<Login> {
 
                         if (firebasetokenResponse.statusCode == 200) {
                           // El firebasetoken se guardó correctamente en la base de datos
-                          print('Firebasetoken guardado en la base de datos');
                         } else {
                           // Ocurrió un error al guardar el firebasetoken en la base de datos
                           Get.back();
-                          final error =
-                              jsonDecode(firebasetokenResponse.body)['message'];
-                          print('Error al guardar el firebasetoken: $error');
                         }
                         Get.back();
                         Get.to(() => Home(
@@ -142,13 +138,10 @@ class _LoginState extends State<Login> {
                       } else {
                         Get.back();
                         // Ocurrió un error al iniciar sesión
-                        final error = jsonDecode(response.body)['message'];
-                        print('Error: $error');
                       }
                     }
-                  } catch (e) {
-                    print('Error: $e');
-                  }
+                    // ignore: empty_catches
+                  } catch (e) {}
                 },
               ),
               TextButton(

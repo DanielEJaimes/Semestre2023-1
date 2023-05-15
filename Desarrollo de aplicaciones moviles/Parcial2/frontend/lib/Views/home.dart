@@ -75,11 +75,6 @@ class _HomeState extends State<Home> {
         actions: [
           IconButton(
               onPressed: () {
-                _showMessagesModal();
-              },
-              icon: const Icon(Icons.message)),
-          IconButton(
-              onPressed: () {
                 prefs.remove('token');
                 Get.offAll(const Login());
               },
@@ -109,64 +104,5 @@ class _HomeState extends State<Home> {
               },
             ),
     );
-  }
-
-  void _showMessagesModal() {
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) {
-        return FutureBuilder<List<String>>(
-          future: getMessages(),
-          builder:
-              (BuildContext context, AsyncSnapshot<List<String>> snapshot) {
-            if (snapshot.hasData) {
-              List<String> messages = snapshot.data!;
-              if (messages.isNotEmpty) {
-                return Container(
-                  height: 600, // Ajusta la altura según tus necesidades
-                  child: ListView.builder(
-                    itemCount: messages.length,
-                    itemBuilder: (context, index) {
-                      return ListTile(
-                        title: Text(messages[index]),
-                      );
-                    },
-                  ),
-                );
-              } else {
-                return const Center(
-                  child: Text('No hay mensajes disponibles'),
-                );
-              }
-            } else if (snapshot.hasError) {
-              return Text('Error: ${snapshot.error}');
-            } else {
-              return const CircularProgressIndicator();
-            }
-          },
-        );
-      },
-    );
-  }
-
-  Future<List<String>> getMessages() async {
-    final response = await http.get(Uri.parse('$api/api/message/$email'));
-
-    if (response.statusCode == 200) {
-      final jsonData = json.decode(response.body);
-      if (jsonData['messages'] is List) {
-        List<String> messages = List<String>.from(jsonData['messages']);
-        return messages;
-      } else if (jsonData['messages'] is String) {
-        String messagesString = jsonData['messages'];
-        List<String> messages = messagesString
-            .split(';'); // Cambia el delimitador ';' según tus necesidades
-        return messages;
-      } else {
-        throw Exception('El campo "messages" no es una lista válida');
-      }
-    } else {
-      throw Exception('Error en la solicitud GET');
-    }
   }
 }
